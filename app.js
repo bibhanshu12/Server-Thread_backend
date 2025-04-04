@@ -11,8 +11,7 @@ const helmet = require('helmet');
 dotenv.config();
 const app =express();
 const port=3000;
-
-app.use(helmet());
+ app.use(helmet());
 app.use(cors({
   origin: 'https://threads.bibhanshu.tech', // Replace with your frontend URL
   credentials:true,
