@@ -11,7 +11,7 @@ const app =express();
 const port=3000;
  
 app.use(cors({
-  origin: 'https://threads.bibhanshu.tech/', // Replace with your frontend URL
+  origin: 'https://threads.bibhanshu.tech', // Replace with your frontend URL
   credentials:true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
