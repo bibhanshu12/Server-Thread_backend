@@ -9,9 +9,9 @@ const cookieParser = require("cookie-parser");
 dotenv.config();
 const app =express();
 const port=3000;
-
+ 
 app.use(cors({
-  origin: 'http://localhost:5173', // Replace with your frontend URL
+  origin: 'https://threads.bibhanshu.tech/', // Replace with your frontend URL
   credentials:true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
