@@ -1,0 +1,15 @@
+node_modules/
+
+
+.env
+
+
+
+
+
+
+
+# Ignore IDE/editor files
+.vscode/
+.idea/
+*.swp
