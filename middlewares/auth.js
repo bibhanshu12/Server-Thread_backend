@@ -1,40 +1,43 @@
-const User=require('../models/userModel');
-const jwt=require('jsonwebtoken')
+const User = require('../models/userModel');
+const jwt = require('jsonwebtoken');
 
-const auth=async(req,res,next)=>{
-    try{
-        const token= req.cookies.token;
-        // console.log('token: ',req.cookies.token);
+const auth = async (req, res, next) => {
+    try {
+        const token = req.cookies.token;
         
-        if(!token){
-        return res.status(400).json({msg:"token not found!",err:err.message});
+        // If no token exists, return unauthorized (without referencing undefined 'err')
+        if (!token) {
+            return res.status(401).json({ msg: "Authentication required - no token found" });
         }
 
-        const decodedtoken=jwt.verify(token,process.env.JWT_SECRET);
-        // console.log(decodedtoken);
-        
-        if(!decodedtoken){
-            return res.status(400).json({msg:"token not found!",err:err.message});
+        // Try to verify the token
+        try {
+            const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+            
+            // Find the user
+            const user = await User.findById(decodedToken.token)
+                .populate('followers')
+                .populate('threads')
+                .populate('replies')
+                .populate('reposts');
+                
+            if (!user) {
+                return res.status(401).json({ msg: "User not found - invalid token" });
+            }
+            
+            // Set user in request and continue
+            req.user = user;
+            next();
+            
+        } catch (jwtError) {
+            // Handle JWT verification errors specifically
+            console.log("JWT verification error:", jwtError.message);
+            return res.status(401).json({ msg: "Invalid or expired token", err: jwtError.message });
         }
-
-        //here it gives the _id to all of the populate 
-        const user=await User.findById(decodedtoken.token)
-        .populate('followers')
-        .populate('threads')
-        .populate('replies')
-        .populate('reposts')
-
-        if(!user){
-        return res.status(400).json({msg:"No user found!",err:err.message});
-        }
-
-        req.user=user;
-        next();
-
-
-    }catch(err){
-        return res.status(400).json({msg:"authentication failed!,please Login",err:err.message});
+    } catch (err) {
+        console.error("Auth middleware error:", err);
+        return res.status(500).json({ msg: "Authentication failed - server error", err: err.message });
     }
-}
+};
 
-module.exports=auth;
+module.exports = auth;

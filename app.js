@@ -7,13 +7,13 @@ const rateLimit = require('express-rate-limit');
 const cookieParser = require("cookie-parser");
 const helmet = require('helmet');
 
-
+// https://threads.bibhanshu.tech
 dotenv.config();
 const app =express();
 const port=3000;
  app.use(helmet());
-app.use(cors({
-  origin: 'https://threads.bibhanshu.tech', // Replace with your frontend URL
+app.use(cors({ 
+  origin: 'http://localhost:5173', 
   credentials:true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -24,8 +24,8 @@ app.use(express.json());
 
 app.use(cookieParser());
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000, 
+  max: 100 
 });
 app.use('/api', apiLimiter);
 

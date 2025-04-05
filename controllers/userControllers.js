@@ -270,16 +270,32 @@ exports.searchUser = async (req, res) => {
 
 exports.logOut = async (req, res) => {
   try {
+    console.log("Logout attempt");
+    
+    // Clear the cookie in multiple ways to ensure it works across browsers
     res.cookie("token", "", {
-      maxAge: Date.now(),
+      maxAge: 0,
       httpOnly: true,
       sameSite: "none",
       secure: true,
-      partitioned:true,
+      partitioned: true,
+      path: "/", // Important! Ensure path matches the cookie path
+      expires: new Date(0) // Force expiration
     });
-
+    
+    // Also try setting cookie with same params as when it was created
+    res.clearCookie("token", {
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+      partitioned: true,
+      path: "/" // Important!
+    });
+    
+    console.log("Cookie cleared");
     return res.status(200).json({ msg: "You logged out!" });
   } catch (err) {
+    console.error("Logout error:", err);
     return res.status(400).json({ msg: "Logout failed!", err: err.message });
   }
 };
