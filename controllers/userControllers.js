@@ -118,25 +118,36 @@ exports.userDetails = async (req, res) => {
   try {
     const { id } = req.params;
     if (!id) {
-      res.status(400).json({ msg: "Id is required!", err: err.message });
+      return res.status(400).json({ msg: "Id is required!", err: err.message });
     }
 
     const user = await User.findById(id)
       .select("-password")
-      .populate("followers")
+      .populate("followers", "-password") // Exclude password from followers
       .populate({
         path: "threads",
-        populate: [{ path: "likes" }, { path: "comments" }, { path: "author" }],
+        populate: [
+          { path: "likes", select: "-password" }, 
+          { path: "comments" }, 
+          { path: "author", select: "-password" } // Exclude password from authors
+        ],
       })
-      .populate({ path: "replies", populate: { path: "author" } })
+      .populate({ 
+        path: "replies", 
+        populate: { path: "author", select: "-password" } // Exclude password from reply authors
+      })
       .populate({
         path: "reposts",
-        populate: [{ path: "likes" }, { path: "comments" }, { path: "author" }],
+        populate: [
+          { path: "likes", select: "-password" }, 
+          { path: "comments" }, 
+          { path: "author", select: "-password" } // Exclude password from repost authors
+        ],
       });
 
     res.status(200).json({ msg: "User Details Fetched!", user });
   } catch (err) {
-    res
+    return res
       .status(400)
       .json({ msg: "error fetching userDetails", err: err.message });
   }
@@ -186,7 +197,7 @@ exports.updateProfile = async (req, res) => {
     if (!userExists) {
       return res
         .status(400)
-        .json({ msg: "user not exists! ", err: err.message });
+        .json({ msg: "user not found! ", err: err.message });
     }
 
     const form = formidable({});
@@ -273,24 +284,8 @@ exports.logOut = async (req, res) => {
     console.log("Logout attempt");
     
     // Clear the cookie in multiple ways to ensure it works across browsers
-    res.cookie("token", "", {
-      maxAge: 0,
-      httpOnly: true,
-      sameSite: "none",
-      secure: true,
-      partitioned: true,
-      path: "/", // Important! Ensure path matches the cookie path
-      expires: new Date(0) // Force expiration
-    });
-    
-    // Also try setting cookie with same params as when it was created
-    res.clearCookie("token", {
-      httpOnly: true,
-      sameSite: "none",
-      secure: true,
-      partitioned: true,
-      path: "/" // Important!
-    });
+
+    res.clearCookie("token");
     
     console.log("Cookie cleared");
     return res.status(200).json({ msg: "You logged out!" });

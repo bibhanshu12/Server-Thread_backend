@@ -246,6 +246,7 @@ exports.singlePost = async (req, res) => {
         path: "comments",
         populate: {
           path: "author",
+          select:"-password"
         },
       });
 

@@ -26,7 +26,7 @@ const auth = require("./middlewares/auth");
 
 const router = express.Router();
 
-router.post("/signup", signIn);
+router.post("/signup", signIn); 
 router.post("/login", login);
 router.get("/user/:id", userDetails);
 router.put("/user/follow/:id", auth, followUser);
