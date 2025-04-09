@@ -3,22 +3,22 @@
 
     const auth = async (req, res, next) => {
         try {
-            const token = req.cookies.token;
+            // const token = req.cookies.token;
             
-            // If no token exists, return unauthorized (without referencing undefined 'err')
-            if (!token) {
-                return res.status(401).json({ msg: "Authentication required - no token found" });
-            }
-
-            // let token;
-            // if (
-            // req.headers.authorization &&
-            // req.headers.authorization.startsWith('Bearer')
-            // ) {
-            // token = req.headers.authorization.split(' ')[1];
-            // } else if (req.cookies && req.cookies.jwt) {
-            // token = req.cookies.token;
+            // // If no token exists, return unauthorized (without referencing undefined 'err')
+            // if (!token) {
+            //     return res.status(401).json({ msg: "Authentication required - no token found" });
             // }
+
+            let token;
+            if (
+            req.headers.authorization &&
+            req.headers.authorization.startsWith('Bearer')
+            ) {
+            token = req.headers.authorization.split(' ')[1];
+            } else if (req.cookies && req.cookies.token) {
+            token = req.cookies.token;
+            }
         
             if (!token) {
             return res.status(401).json({
@@ -46,7 +46,7 @@
                 // Set user in request and continue
                 req.user = user;
                 next();
-                
+                "Authentications Failed !"
             } catch (jwtError) {
                 // Handle JWT verification errors specifically
                 console.log("JWT verification error:", jwtError.message);

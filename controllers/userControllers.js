@@ -190,6 +190,7 @@ exports.followUser = async (req, res) => {
   }
 };
 
+
 exports.updateProfile = async (req, res) => {
   try {
     const userExists = await User.findById(req.user._id);
@@ -285,8 +286,11 @@ exports.logOut = async (req, res) => {
     
     // Clear the cookie in multiple ways to ensure it works across browsers
 
-    res.clearCookie("token");
-    
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // optional, for HTTPS only in prod
+      sameSite: "strict", // optional, prevents CSRF
+    });
     console.log("Cookie cleared");
     return res.status(200).json({ msg: "You logged out!" });
   } catch (err) {
